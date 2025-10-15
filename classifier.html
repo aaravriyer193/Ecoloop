@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>EcoLoop — Trash Classifier</title>
+  <link rel="stylesheet" href="/styles/theme.css">
+  <!-- TensorFlow.js (browser) -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container row">
+      <a href="/"><img src="/assets/logo.png" alt="EcoLoop logo" height="24"></a>
+      <div class="spacer"></div>
+      <a href="/product-finder.html">Finder</a>
+      <a href="/hub.html">Hub</a>
+    </div>
+  </nav>
+
+  <header class="container hero">
+    <div>
+      <h1>Trash Classifier</h1>
+      <p class="muted">Runs locally with TensorFlow.js. After classification, Gemini explains correct disposal.</p>
+    </div>
+    <div class="card">
+      <img src="/assets/classifier-banner.png" alt="Classifier banner">
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <label for="file">Upload image</label>
+      <input type="file" id="file" class="input" accept="image/*">
+      <p style="margin-top:10px"><button class="btn" id="run">Classify</button></p>
+      <div id="preview" class="card" style="display:none;margin-top:12px"></div>
+      <div id="result" class="card" style="display:none;margin-top:12px"></div>
+      <div id="advice" class="card" style="display:none;margin-top:12px"></div>
+    </section>
+  </main>
+
+  <script>
+    let model, labels= [];
+    async function loadConfig(){
+      const r = await fetch('/api/tf-model');
+      const cfg = await r.json();
+      if(!cfg.modelUrl) throw new Error('Missing modelUrl');
+      if(cfg.labels && Array.isArray(cfg.labels)) labels = cfg.labels;
+      model = await tf.loadGraphModel(cfg.modelUrl);
+      return cfg;
+    }
+
+    function fileToImg(file){
+      return new Promise((resolve,reject)=>{
+        const fr = new FileReader();
+        fr.onload = () => {
+          const img = new Image();
+          img.onload = () => resolve({src:fr.result, img});
+          img.onerror = reject;
+          img.src = fr.result;
+        };
+        fr.onerror = reject;
+        fr.readAsDataURL(file);
+      });
+    }
+
+    async function classify(imageEl, cfg){
+      // Example: resize to expected shape; adapt as per your model input
+      const size = cfg.inputSize || 224;
+      const t = tf.tidy(() => tf.browser.fromPixels(imageEl).resizeBilinear([size,size]).toFloat().div(255).expandDims(0));
+      const logits = model.execute ? model.execute(t) : model.predict(t);
+      const data = await logits.data();
+      tf.dispose([t, logits]);
+      // Top-1
+      let bestI = 0; for(let i=1;i<data.length;i++){ if(data[i] > data[bestI]) bestI = i; }
+      const label = labels[bestI] || `class_${bestI}`;
+      const prob = data[bestI];
+      return { label, probability: +prob.toFixed(4) };
+    }
+
+    document.getElementById('run').addEventListener('click', async () => {
+      const f = document.getElementById('file').files?.[0];
+      if(!f) return alert('Select an image file.');
+      const cfg = await loadConfig();
+      const {src, img} = await fileToImg(f);
+
+      const preview = document.getElementById('preview');
+      preview.style.display='block';
+      preview.innerHTML = `<img src="${src}" alt="uploaded image">`;
+
+      const {label, probability} = await classify(img, cfg);
+      const result = document.getElementById('result');
+      result.style.display='block';
+      result.innerHTML = `<h3>Prediction: ${label}</h3><p>Confidence: ${(probability*100).toFixed(2)}%</p>`;
+
+      // Ask Gemini for disposal guidance based on label
+      const prompt = `Classified material: ${label}. Provide correct bin color and concise recycling/disposal instructions (region-agnostic), plus one environmental fact. Return 3 short bullet points.`;
+      const res = await fetch('/api/coach', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ prompt })
+      });
+      const data = await res.json();
+      const advice = document.getElementById('advice');
+      advice.style.display='block';
+      advice.innerText = data.text || data.markdown || JSON.stringify(data);
+    });
+  </script>
+</body>
+</html>
