@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>EcoLoop — Profile</title>
+  <link rel="stylesheet" href="/styles/theme.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="container row">
+      <a href="/"><img src="/assets/logo.png" alt="EcoLoop logo" height="24"></a>
+      <div class="spacer"></div>
+      <a href="/hub.html">Hub</a>
+      <a href="/product-finder.html">Finder</a>
+    </div>
+  </nav>
+
+  <header class="container hero">
+    <div>
+      <h1>Your Profile</h1>
+      <p class="muted">Manage region and preferences for better recommendations.</p>
+    </div>
+    <div class="card">
+      <img src="/assets/profile-banner.png" alt="Profile banner">
+    </div>
+  </header>
+
+  <main class="container grid cols-2">
+    <section class="card">
+      <h2>Preferences</h2>
+      <label for="region">Region</label>
+      <input id="region" class="input" placeholder="e.g., UAE">
+      <label for="budget">Budget</label>
+      <select id="budget" class="input">
+        <option value="">No preference</option>
+        <option value="low">Low</option>
+        <option value="mid">Mid</option>
+        <option value="high">High</option>
+      </select>
+      <p><button class="btn" id="save">Save</button></p>
+      <div id="saved" class="notice" style="display:none">Saved.</div>
+    </section>
+
+    <section class="card">
+      <h2>Account</h2>
+      <p class="muted">Hook up auth later if needed. No data stored in this starter.</p>
+    </section>
+  </main>
+
+  <script>
+    document.getElementById('save').addEventListener('click', () => {
+      // Local-only persistence for starter
+      const prefs = {
+        region: document.getElementById('region').value.trim(),
+        budget: document.getElementById('budget').value
+      };
+      localStorage.setItem('ecoloop_prefs', JSON.stringify(prefs));
+      document.getElementById('saved').style.display='block';
+    });
+  </script>
+</body>
+</html>
