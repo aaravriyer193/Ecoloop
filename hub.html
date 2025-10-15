@@ -13,6 +13,8 @@
       <div class="spacer"></div>
       <a href="/classifier.html">Classifier</a>
       <a href="/product-finder.html">Finder</a>
+      <a href="/community.html">Community</a>
+      <a href="/learn.html">Learn</a>
       <a href="/profile.html">Profile</a>
     </div>
   </nav>
@@ -20,20 +22,25 @@
   <main class="container grid cols-2">
     <section class="card">
       <h2>AI Coach</h2>
-      <p class="muted">Ask practical sustainability questions.</p>
+      <p class="muted">Ask practical sustainability questions. Serverless Gemini only.</p>
       <label for="coachQ">Your question</label>
-      <textarea id="coachQ" rows="5" placeholder="e.g., How can I reduce standby power without new devices?"></textarea>
-      <p><button class="btn" id="ask">Ask Gemini Coach</button></p>
+      <textarea id="coachQ" rows="5" class="input" placeholder="e.g., Best low-cost ways to cut standby power?"></textarea>
+      <p><button class="btn cta" id="ask">Ask Gemini Coach</button></p>
       <div id="coachA" class="card"></div>
     </section>
 
     <aside class="card">
-      <h2>EcoLoop Hub</h2>
-      <p class="muted">Navigate to classifier or product finder for focused actions. All AI calls go through serverless endpoints.</p>
-      <img src="/assets/hero.png" alt="Hub preview">
-      <div class="notice" style="margin-top:12px">
-        Serverless only: no service account. Set <code>GEMINI_API_KEY</code> and optional <code>GEMINI_MODEL</code>.
+      <h2>Quick Actions</h2>
+      <div class="grid cols-2">
+        <a class="btn" href="/classifier.html">Classify an Item</a>
+        <a class="btn" href="/product-finder.html">Find an Alternative</a>
+        <a class="btn" href="/community.html">Start a Challenge</a>
+        <a class="btn" href="/learn.html">Learn a Skill</a>
       </div>
+      <div class="notice" style="margin-top:12px">
+        Set <code>GEMINI_API_KEY</code> (and optional <code>GEMINI_MODEL</code>) in Netlify env.
+      </div>
+      <img src="/assets/hero.png" alt="Hub preview" style="margin-top:12px;border-radius:12px">
     </aside>
   </main>
 
@@ -42,8 +49,7 @@
       const q = document.getElementById('coachQ').value.trim();
       if(!q) return;
       const res = await fetch('/api/coach', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
+        method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ prompt: q })
       });
       const data = await res.json();
