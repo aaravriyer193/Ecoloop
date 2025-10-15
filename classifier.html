@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>EcoLoop — Trash Classifier</title>
   <link rel="stylesheet" href="/styles/theme.css">
-  <!-- TensorFlow.js (browser) -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
 </head>
 <body>
@@ -14,6 +13,7 @@
       <a href="/"><img src="/assets/logo.png" alt="EcoLoop logo" height="24"></a>
       <div class="spacer"></div>
       <a href="/product-finder.html">Finder</a>
+      <a href="/learn.html">Learn</a>
       <a href="/hub.html">Hub</a>
     </div>
   </nav>
@@ -21,7 +21,7 @@
   <header class="container hero">
     <div>
       <h1>Trash Classifier</h1>
-      <p class="muted">Runs locally with TensorFlow.js. After classification, Gemini explains correct disposal.</p>
+      <p>Local-only image classification with TensorFlow.js. Then Gemini explains how to dispose.</p>
     </div>
     <div class="card">
       <img src="/assets/classifier-banner.png" alt="Classifier banner">
@@ -32,7 +32,11 @@
     <section class="card">
       <label for="file">Upload image</label>
       <input type="file" id="file" class="input" accept="image/*">
-      <p style="margin-top:10px"><button class="btn" id="run">Classify</button></p>
+      <div class="grid cols-3" style="margin-top:12px">
+        <button class="btn cta" id="run">Classify</button>
+        <button class="btn" id="clear">Clear</button>
+        <a class="btn" href="/product-finder.html">Find Sustainable Alternative</a>
+      </div>
       <div id="preview" class="card" style="display:none;margin-top:12px"></div>
       <div id="result" class="card" style="display:none;margin-top:12px"></div>
       <div id="advice" class="card" style="display:none;margin-top:12px"></div>
@@ -53,29 +57,18 @@
     function fileToImg(file){
       return new Promise((resolve,reject)=>{
         const fr = new FileReader();
-        fr.onload = () => {
-          const img = new Image();
-          img.onload = () => resolve({src:fr.result, img});
-          img.onerror = reject;
-          img.src = fr.result;
-        };
-        fr.onerror = reject;
-        fr.readAsDataURL(file);
+        fr.onload = () => { const img=new Image(); img.onload=()=>resolve({src:fr.result,img}); img.onerror=reject; img.src=fr.result; };
+        fr.onerror = reject; fr.readAsDataURL(file);
       });
     }
 
     async function classify(imageEl, cfg){
-      // Example: resize to expected shape; adapt as per your model input
       const size = cfg.inputSize || 224;
       const t = tf.tidy(() => tf.browser.fromPixels(imageEl).resizeBilinear([size,size]).toFloat().div(255).expandDims(0));
       const logits = model.execute ? model.execute(t) : model.predict(t);
-      const data = await logits.data();
-      tf.dispose([t, logits]);
-      // Top-1
+      const data = await logits.data(); tf.dispose([t, logits]);
       let bestI = 0; for(let i=1;i<data.length;i++){ if(data[i] > data[bestI]) bestI = i; }
-      const label = labels[bestI] || `class_${bestI}`;
-      const prob = data[bestI];
-      return { label, probability: +prob.toFixed(4) };
+      return { label: labels[bestI] || `class_${bestI}`, probability: +data[bestI].toFixed(4) };
     }
 
     document.getElementById('run').addEventListener('click', async () => {
@@ -83,27 +76,19 @@
       if(!f) return alert('Select an image file.');
       const cfg = await loadConfig();
       const {src, img} = await fileToImg(f);
-
-      const preview = document.getElementById('preview');
-      preview.style.display='block';
-      preview.innerHTML = `<img src="${src}" alt="uploaded image">`;
-
+      const preview = document.getElementById('preview'); preview.style.display='block'; preview.innerHTML = `<img src="${src}" alt="uploaded">`;
       const {label, probability} = await classify(img, cfg);
-      const result = document.getElementById('result');
-      result.style.display='block';
-      result.innerHTML = `<h3>Prediction: ${label}</h3><p>Confidence: ${(probability*100).toFixed(2)}%</p>`;
+      const result = document.getElementById('result'); result.style.display='block'; result.innerHTML = `<h3>Prediction: ${label}</h3><p>Confidence: ${(probability*100).toFixed(2)}%</p>`;
 
-      // Ask Gemini for disposal guidance based on label
-      const prompt = `Classified material: ${label}. Provide correct bin color and concise recycling/disposal instructions (region-agnostic), plus one environmental fact. Return 3 short bullet points.`;
-      const res = await fetch('/api/coach', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ prompt })
-      });
+      const prompt = `Material: ${label}. Provide bin color and concise recycling/disposal instructions (region-agnostic), plus a short environmental fact. 3 bullets only.`;
+      const res = await fetch('/api/coach', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ prompt }) });
       const data = await res.json();
-      const advice = document.getElementById('advice');
-      advice.style.display='block';
-      advice.innerText = data.text || data.markdown || JSON.stringify(data);
+      const advice = document.getElementById('advice'); advice.style.display='block'; advice.innerText = data.text || data.markdown || JSON.stringify(data);
+    });
+
+    document.getElementById('clear').addEventListener('click', () => {
+      ['preview','result','advice'].forEach(id => { const el=document.getElementById(id); el.style.display='none'; el.innerHTML=''; });
+      document.getElementById('file').value = '';
     });
   </script>
 </body>
