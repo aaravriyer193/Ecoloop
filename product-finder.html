@@ -12,6 +12,8 @@
       <a href="/"><img src="/assets/logo.png" alt="EcoLoop logo" height="24"></a>
       <div class="spacer"></div>
       <a href="/classifier.html">Classifier</a>
+      <a href="/community.html">Community</a>
+      <a href="/learn.html">Learn</a>
       <a href="/hub.html">Hub</a>
     </div>
   </nav>
@@ -19,17 +21,17 @@
   <header class="container hero">
     <div>
       <h1>Sustainable Product Finder</h1>
-      <p class="muted">Ask for eco-friendly alternatives. Results come from serverless Gemini.</p>
+      <p>Gemini suggests verified eco-friendly alternatives with succinct impact notes.</p>
       <div class="card">
-        <label for="q">Describe the product to replace</label>
+        <label for="q">Product to replace</label>
         <input id="q" class="input" placeholder="e.g., plastic cling wrap">
-        <div class="grid cols-2" style="margin-top:10px">
+        <div class="grid cols-3" style="margin-top:10px">
           <div>
-            <label for="region">Region (optional)</label>
+            <label for="region">Region</label>
             <input id="region" class="input" placeholder="e.g., UAE">
           </div>
           <div>
-            <label for="budget">Budget (optional)</label>
+            <label for="budget">Budget</label>
             <select id="budget" class="input">
               <option value="">No preference</option>
               <option value="low">Low</option>
@@ -37,8 +39,21 @@
               <option value="high">High</option>
             </select>
           </div>
+          <div>
+            <label for="labels">Sustainability label</label>
+            <select id="labels" class="input">
+              <option value="">Any</option>
+              <option>FSC</option>
+              <option>Energy Star</option>
+              <option>Organic</option>
+              <option>Fairtrade</option>
+              <option>OEKO-TEX</option>
+            </select>
+          </div>
         </div>
-        <p style="margin-top:10px"><button class="btn" id="find">Find Alternatives</button></p>
+        <p style="margin-top:10px">
+          <button class="btn cta" id="find">Find Alternatives</button>
+        </p>
       </div>
     </div>
     <div class="card">
@@ -47,31 +62,45 @@
   </header>
 
   <main class="container">
+    <div class="section-title">
+      <h2>Results</h2>
+      <div class="tabbar">
+        <button class="tab active" data-sort="impact">Sort: Impact</button>
+        <button class="tab" data-sort="savings">Sort: Savings</button>
+        <button class="tab" data-sort="name">Sort: Name</button>
+      </div>
+    </div>
     <section id="results" class="grid cols-3"></section>
   </main>
 
   <script>
+    let lastItems = [];
     function cardHTML(item){
       return `<div class="card">
         <h3>${item.name}</h3>
         <p class="muted">${item.summary}</p>
-        <p><strong>Impact:</strong> ${item.impact}</p>
-        <p><strong>Est. Savings:</strong> ${item.savings}</p>
+        <table class="table"><tr><th>Impact</th><td>${item.impact}</td></tr><tr><th>Est. Savings</th><td>${item.savings}</td></tr></table>
       </div>`;
     }
+    function render(items){ document.getElementById('results').innerHTML = items.map(cardHTML).join(''); }
     document.getElementById('find').addEventListener('click', async () => {
-      const query = document.getElementById('q').value.trim();
-      if(!query) return;
+      const query = document.getElementById('q').value.trim(); if(!query) return;
       const region = document.getElementById('region').value.trim();
       const budget = document.getElementById('budget').value;
-      const res = await fetch('/api/sustainable-finder', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ query, region, budget })
-      });
+      const labels = document.getElementById('labels').value;
+      const res = await fetch('/api/sustainable-finder', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ query, region, budget, labels }) });
       const data = await res.json();
-      const list = Array.isArray(data.items) ? data.items : [];
-      document.getElementById('results').innerHTML = list.map(cardHTML).join('');
+      lastItems = Array.isArray(data.items) ? data.items : [];
+      render(lastItems);
+    });
+    document.querySelectorAll('.tabbar .tab').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('.tabbar .tab').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const k = btn.dataset.sort;
+        const sorted = [...lastItems].sort((a,b)=> String(a[k]||'').localeCompare(String(b[k]||'')));
+        render(sorted);
+      });
     });
   </script>
 </body>
