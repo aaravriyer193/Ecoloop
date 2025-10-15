@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>EcoLoop — Community & Challenges</title>
+  <link rel="stylesheet" href="/styles/theme.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="container row">
+      <a href="/"><img src="/assets/logo.png" alt="EcoLoop logo" height="24"></a>
+      <div class="spacer"></div>
+      <a href="/hub.html">Hub</a>
+      <a href="/product-finder.html">Finder</a>
+    </div>
+  </nav>
+
+  <header class="container hero">
+    <div>
+      <h1>Community & Challenges</h1>
+      <p class="muted">Organize drives, pledge challenges, and share wins.</p>
+    </div>
+    <div class="card">
+      <img src="/assets/community-banner.png" alt="Community banner">
+    </div>
+  </header>
+
+  <main class="container grid cols-2">
+    <section class="card">
+      <h2>Create a Challenge</h2>
+      <label for="title">Title</label>
+      <input id="title" class="input" placeholder="e.g., No Plastic Week">
+      <label for="rules">Rules / Goal</label>
+      <textarea id="rules" rows="4" class="input" placeholder="Keep it clear and fair."></textarea>
+      <p><button class="btn" id="create">Create</button></p>
+      <div id="status" class="notice" style="display:none"></div>
+    </section>
+
+    <section class="card">
+      <h2>How to Use</h2>
+      <ol>
+        <li>Post your challenge on your social/community platform.</li>
+        <li>Track progress manually or via future integrations.</li>
+        <li>Celebrate milestones.</li>
+      </ol>
+    </section>
+  </main>
+
+  <script>
+    document.getElementById('create').addEventListener('click', () => {
+      const title = document.getElementById('title').value.trim();
+      const rules = document.getElementById('rules').value.trim();
+      if(!title || !rules) return alert('Fill in title and rules.');
+      const st = document.getElementById('status');
+      st.style.display='block';
+      st.textContent = `Challenge created: ${title}`;
+    });
+  </script>
+</body>
+</html>
