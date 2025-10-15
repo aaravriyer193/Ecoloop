@@ -13,13 +13,15 @@
       <div class="spacer"></div>
       <a href="/hub.html">Hub</a>
       <a href="/product-finder.html">Finder</a>
+      <a href="/learn.html">Learn</a>
+      <a href="/profile.html">Profile</a>
     </div>
   </nav>
 
   <header class="container hero">
     <div>
       <h1>Community & Challenges</h1>
-      <p class="muted">Organize drives, pledge challenges, and share wins.</p>
+      <p>Create pledges, organize cleanups, and celebrate wins with badges.</p>
     </div>
     <div class="card">
       <img src="/assets/community-banner.png" alt="Community banner">
@@ -32,18 +34,39 @@
       <label for="title">Title</label>
       <input id="title" class="input" placeholder="e.g., No Plastic Week">
       <label for="rules">Rules / Goal</label>
-      <textarea id="rules" rows="4" class="input" placeholder="Keep it clear and fair."></textarea>
-      <p><button class="btn" id="create">Create</button></p>
-      <div id="status" class="notice" style="display:none"></div>
+      <textarea id="rules" rows="4" class="input" placeholder="Keep it clear & fair."></textarea>
+      <div class="grid cols-2" style="margin-top:10px">
+        <button class="btn cta" id="create">Create</button>
+        <a class="btn" href="/learn.html">Suggested Tips</a>
+      </div>
+      <div id="status" class="notice" style="display:none;margin-top:10px"></div>
     </section>
 
     <section class="card">
-      <h2>How to Use</h2>
-      <ol>
-        <li>Post your challenge on your social/community platform.</li>
-        <li>Track progress manually or via future integrations.</li>
-        <li>Celebrate milestones.</li>
-      </ol>
+      <h2>Popular Badges</h2>
+      <ul>
+        <li>Plastic-Free Pro (7-day streak)</li>
+        <li>Energy Saver Lv.3</li>
+        <li>Water-Wise Champion</li>
+        <li>Repair & Reuse Advocate</li>
+        <li>Community Organizer</li>
+      </ul>
+      <p><a class="btn" href="#rewards">Go to Rewards</a></p>
+    </section>
+
+    <section id="rewards" class="card" style="grid-column:1/-1">
+      <h2>Rewards Center</h2>
+      <p>Redeem points for impactful items and experiences:</p>
+      <div class="grid cols-4">
+        <div class="card"><h4>Tree Planting (1)</h4><p>Plant a tree via partner NGO.</p><button class="btn">Redeem 250 pts</button></div>
+        <div class="card"><h4>Community Cleanup Kit</h4><p>Gloves, bags, tongs, guide.</p><button class="btn">Redeem 400 pts</button></div>
+        <div class="card"><h4>Water Saver Aerators</h4><p>2× faucet aerators pack.</p><button class="btn">Redeem 300 pts</button></div>
+        <div class="card"><h4>LED Upgrade Voucher</h4><p>Discount on LED bulbs.</p><button class="btn">Redeem 500 pts</button></div>
+        <div class="card"><h4>Home Compost Starter</h4><p>Small bin + guide.</p><button class="btn">Redeem 450 pts</button></div>
+        <div class="card"><h4>Transit Pass Credit</h4><p>Encourage public transport.</p><button class="btn">Redeem 600 pts</button></div>
+        <div class="card"><h4>Repair Cafe Token</h4><p>Fix or extend product life.</p><button class="btn">Redeem 350 pts</button></div>
+        <div class="card"><h4>School Eco-Kit</h4><p>Clubs & classroom support.</p><button class="btn">Redeem 700 pts</button></div>
+      </div>
     </section>
   </main>
 
