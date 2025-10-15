@@ -25,27 +25,47 @@
 
   <header class="container hero">
     <div>
-      <span class="badge">All-in-one sustainability</span>
-      <h1>Track, recycle, and choose better — with AI.</h1>
-      <p class="muted">Privacy-first. Mobile-ready. Serverless Gemini API.</p>
+      <span class="badge">All-in-one Sustainability</span>
+      <h1>Act smart, act green, act together.</h1>
+      <p>Track impact, classify waste on-device, and choose better products with serverless AI.</p>
       <p>
-        <a class="btn" href="/hub.html">Enter Hub</a>
+        <a class="btn cta" href="/hub.html">Enter Hub</a>
         <a class="btn" href="/classifier.html">Try Classifier</a>
+        <a class="btn" href="/product-finder.html">Find Alternatives</a>
       </p>
+      <div class="kpis" style="margin-top:10px">
+        <div class="kpi"><div class="muted">Users</div><div class="val">You</div></div>
+        <div class="kpi"><div class="muted">Privacy</div><div class="val">Serverless</div></div>
+        <div class="kpi"><div class="muted">AI</div><div class="val">Gemini</div></div>
+        <div class="kpi"><div class="muted">Classifier</div><div class="val">TFJS</div></div>
+      </div>
     </div>
     <div class="card">
       <img src="/assets/hero.png" alt="EcoLoop hero banner">
     </div>
   </header>
 
-  <main class="container grid cols-3">
-    <div class="card"><h3>Hub</h3><p>Metrics & AI coaching.</p></div>
-    <div class="card"><h3>Trash Classifier</h3><p>On-device TFJS identification.</p></div>
-    <div class="card"><h3>Finder</h3><p>Gemini suggests sustainable alternatives.</p></div>
-  </main>
+  <section class="container">
+    <div class="section-title">
+      <h2>Explore</h2>
+      <div class="tabbar">
+        <a class="tab active" href="/hub.html">Hub</a>
+        <a class="tab" href="/classifier.html">Trash Classifier</a>
+        <a class="tab" href="/product-finder.html">Product Finder</a>
+        <a class="tab" href="/community.html">Community</a>
+        <a class="tab" href="/learn.html">Learn</a>
+        <a class="tab" href="/profile.html">Profile</a>
+      </div>
+    </div>
+    <div class="grid cols-3">
+      <div class="card"><h3>Telemetry & Coach</h3><p>Ask the coach anything sustainability. All calls via serverless Gemini.</p></div>
+      <div class="card"><h3>On-device Classification</h3><p>Secure TFJS image reasoning—no file leaves your browser.</p></div>
+      <div class="card"><h3>Eco Alternatives</h3><p>Compare impact and savings for product choices.</p></div>
+    </div>
+  </section>
 
   <footer class="container footer">
-    <small>© EcoLoop Hub • Add Privacy / About / Contact links</small>
+    <small>© EcoLoop Hub • Light theme • No service accounts • Netlify Functions</small>
   </footer>
 </body>
 </html>
