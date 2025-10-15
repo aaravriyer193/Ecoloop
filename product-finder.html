@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>EcoLoop — Sustainable Product Finder</title>
+  <link rel="stylesheet" href="/styles/theme.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="container row">
+      <a href="/"><img src="/assets/logo.png" alt="EcoLoop logo" height="24"></a>
+      <div class="spacer"></div>
+      <a href="/classifier.html">Classifier</a>
+      <a href="/hub.html">Hub</a>
+    </div>
+  </nav>
+
+  <header class="container hero">
+    <div>
+      <h1>Sustainable Product Finder</h1>
+      <p class="muted">Ask for eco-friendly alternatives. Results come from serverless Gemini.</p>
+      <div class="card">
+        <label for="q">Describe the product to replace</label>
+        <input id="q" class="input" placeholder="e.g., plastic cling wrap">
+        <div class="grid cols-2" style="margin-top:10px">
+          <div>
+            <label for="region">Region (optional)</label>
+            <input id="region" class="input" placeholder="e.g., UAE">
+          </div>
+          <div>
+            <label for="budget">Budget (optional)</label>
+            <select id="budget" class="input">
+              <option value="">No preference</option>
+              <option value="low">Low</option>
+              <option value="mid">Mid</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+        </div>
+        <p style="margin-top:10px"><button class="btn" id="find">Find Alternatives</button></p>
+      </div>
+    </div>
+    <div class="card">
+      <img src="/assets/finder-banner.png" alt="Finder banner">
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="results" class="grid cols-3"></section>
+  </main>
+
+  <script>
+    function cardHTML(item){
+      return `<div class="card">
+        <h3>${item.name}</h3>
+        <p class="muted">${item.summary}</p>
+        <p><strong>Impact:</strong> ${item.impact}</p>
+        <p><strong>Est. Savings:</strong> ${item.savings}</p>
+      </div>`;
+    }
+    document.getElementById('find').addEventListener('click', async () => {
+      const query = document.getElementById('q').value.trim();
+      if(!query) return;
+      const region = document.getElementById('region').value.trim();
+      const budget = document.getElementById('budget').value;
+      const res = await fetch('/api/sustainable-finder', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ query, region, budget })
+      });
+      const data = await res.json();
+      const list = Array.isArray(data.items) ? data.items : [];
+      document.getElementById('results').innerHTML = list.map(cardHTML).join('');
+    });
+  </script>
+</body>
+</html>
